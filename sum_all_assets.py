@@ -93,6 +93,7 @@ for role in get_roles:
                     df_data["party_number"].append(candidate_info["partido"]["numero"])
                     df_data["party_code"].append(candidate_info["partido"]["sigla"])
                     df_data["party_name"].append(candidate_info["partido"]["nome"])
+                    df_data["titulo_eleitor"].append(candidate_info["tituloEleitor"])
                     candidate_assets = candidate_info["totalDeBens"]
                     total_uf += candidate_assets
                 except Exception as e:
@@ -107,4 +108,62 @@ df = pd.DataFrame(df_data)
 
 df.to_csv("./data/deputado_federal_info.csv", index=False)
 
+
+
+# get 2018 winners
+
+df_data = defaultdict(list)
+
+for role in get_roles:
+    for uf in states_uf:
+        total_uf = 0
+        with open(BASE_PATH/"data"/ f"{role}_2018" /f"{uf}_{role}.json", "r+") as fp:
+            state_data = json.load(fp)
+        candidates = state_data["candidatos"]
+        for candidate in candidates:
+            candidate_id = candidate["id"]
+            role_code = roles_codes["deputado_federal"]
+            name = candidate["nomeUrna"]
+            file_name = f"{uf}_{role}_{candidate_id}_info.json"
+            file_p = Path(f"./data/info_2018_winners/{file_name}")
+            election_outcome = candidate["descricaoTotalizacao"]
+            if election_outcome in ["Eleito por m\u00e9dia","Eleito por QP"]:
+                if file_p.exists:
+                    try:
+                        with open(file_p, "r+") as fp:
+                            candidate_info = json.load(fp)
+                        df_data["candidate_id"].append(candidate_info["id"])
+                        df_data["running_role"].append("deputado federal")
+                        df_data["candidate_assets"].append(candidate_info["totalDeBens"])
+                        df_data["name_ballot"].append(candidate_info["nomeUrna"])
+                        df_data["number"].append(candidate_info["numero"])
+                        df_data["full_name"].append(candidate_info["nomeCompleto"])
+                        df_data["sex"].append(candidate_info["descricaoSexo"])
+                        df_data["dob"].append(candidate_info["dataDeNascimento"])
+                        df_data["marital_status"].append(candidate_info["descricaoEstadoCivil"])
+                        df_data["race"].append(candidate_info["descricaoCorRaca"])
+                        df_data["nationality"].append(candidate_info["nacionalidade"])
+                        df_data["education"].append(candidate_info["grauInstrucao"])
+                        df_data["occupation"].append(candidate_info["ocupacao"])
+                        df_data["campaign_expenses1T"].append(candidate_info["gastoCampanha1T"])
+                        df_data["birth_uf"].append(candidate_info["sgUfNascimento"])
+                        df_data["birth_town"].append(candidate_info["nomeMunicipioNascimento"])
+                        df_data["place_candidate"].append(candidate_info["localCandidatura"])
+                        df_data["uf_candidate"].append(candidate_info["ufCandidatura"])
+                        df_data["photo_url"].append(candidate_info["fotoUrl"])
+                        df_data["election_outcome"].append(candidate_info["descricaoTotalizacao"])
+                        df_data["coalition"].append(candidate_info["nomeColigacao"])
+                        df_data["party_number"].append(candidate_info["partido"]["numero"])
+                        df_data["party_code"].append(candidate_info["partido"]["sigla"])
+                        df_data["party_name"].append(candidate_info["partido"]["nome"])
+                        df_data["titulo_eleitor"].append(candidate_info["tituloEleitor"])
+                        candidate_assets = candidate_info["totalDeBens"]
+                        total_uf += candidate_assets
+                    except Exception as e:
+                        print(e)
+
+
+df = pd.DataFrame(df_data)
+
+df.to_csv("./data/deputado_federal_info_2018.csv", index=False)
 

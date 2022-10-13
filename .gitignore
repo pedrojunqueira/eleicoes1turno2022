@@ -2,3 +2,5 @@
 .venv
 data
 notes.txt
+data.zip
+*.ipynb
